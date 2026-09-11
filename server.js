@@ -79,13 +79,13 @@ async function generateReason({ userChoice, aiChoice, outcome, recentReasons = [
   ].join('\n');
 
   if (process.env.GEMINI_API_KEY) {
-    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
     const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 1.15, maxOutputTokens: 60 }
+        generationConfig: { temperature: 1.15, maxOutputTokens: 200 }
       })
     });
     if (!apiResponse.ok) throw new Error(`Gemini request failed: ${apiResponse.status}`);
