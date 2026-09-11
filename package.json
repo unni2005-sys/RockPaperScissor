@@ -1,0 +1,12 @@
+{
+  "name": "rps-unfair-advantage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A suspiciously rigged Rock Paper Scissors game with AI-generated explanations.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

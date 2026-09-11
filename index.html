@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPS // Unfair Advantage</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      --ink: #1d2730;
+      --muted: #68757a;
+      --paper: #f5f1e9;
+      --line: #d9d2c5;
+      --red: #d94f3d;
+      --red-dark: #a83227;
+      --blue: #315c67;
+      --yellow: #efd271;
+      --green: #4c896f;
+      --shadow: 0 18px 50px rgba(44, 39, 31, 0.11);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .42;
+      background-image: radial-gradient(#c8bfae 0.65px, transparent 0.65px);
+      background-size: 8px 8px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+      position: relative;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--red);
+      font-size: 15px;
+      font-weight: 500;
+      transform: rotate(-8deg);
+    }
+
+    .case-file {
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .07em;
+    }
+
+    main { padding-top: 58px; }
+
+    .intro {
+      max-width: 760px;
+      animation: reveal .65s ease both;
+    }
+
+    .eyebrow {
+      color: var(--red-dark);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(3.6rem, 9vw, 7.5rem);
+      line-height: .86;
+      letter-spacing: -.075em;
+      font-weight: 600;
+      max-width: 700px;
+    }
+
+    .intro-copy {
+      margin: 26px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr);
+      gap: 24px;
+      margin-top: 58px;
+      align-items: start;
+    }
+
+    .arena {
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 42px);
+      animation: reveal .7s .1s ease both;
+    }
+
+    .section-label {
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin: 0 0 22px;
+    }
+
+    .choice-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .choice {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 170px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+      font: inherit;
+      text-align: left;
+    }
+
+    .choice:hover, .choice:focus-visible {
+      transform: translateY(-5px);
+      border-color: var(--ink);
+      outline: none;
+      background: #fff;
+    }
+
+    .choice:focus-visible { box-shadow: 0 0 0 3px var(--yellow); }
+    .choice.selected { border-color: var(--blue); background: var(--blue); color: white; }
+
+    .choice-icon {
+      font-size: 56px;
+      line-height: 1;
+      filter: grayscale(.2);
+    }
+
+    .choice-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .result {
+      min-height: 182px;
+      border-top: 1px solid var(--line);
+      margin-top: 34px;
+      padding-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .matchup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .token {
+      width: 76px;
+      height: 76px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+    }
+
+    .token.ai { background: var(--red); color: white; border-color: var(--red); }
+    .versus { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; }
+    .result-kicker { color: var(--red-dark); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 10px; }
+    .result-title { margin: 0; font-size: 28px; letter-spacing: -.04em; }
+    .result-copy { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 8px 0 0; }
+    .result-copy em { color: var(--ink); font-style: normal; }
+
+    .side-column { display: grid; gap: 24px; animation: reveal .7s .2s ease both; }
+
+    .panel {
+      border: 1px solid var(--line);
+      padding: 24px;
+      background: rgba(255, 253, 249, .58);
+    }
+
+    .score-header { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 17px; }
+    .score-header .section-label { margin: 0; }
+    .status-dot { display: inline-block; width: 7px; height: 7px; background: var(--green); border-radius: 50%; margin-right: 6px; }
+    .live { color: var(--green); font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; }
+    .score { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; padding: 26px 0 21px; }
+    .score-number { font-size: 52px; font-weight: 600; letter-spacing: -.07em; line-height: 1; }
+    .score-label { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; margin-top: 7px; }
+    .score-divider { height: 44px; border-left: 1px solid var(--line); }
+    .score-block:last-child { text-align: right; }
+    .score-block:last-child .score-number { color: var(--red); }
+    .suspicion { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.5; }
+    .suspicion strong { color: var(--red-dark); font-weight: 500; }
+
+    .audit { background: var(--yellow); border-color: #e0c45c; transform: rotate(1deg); }
+    .audit .section-label { color: var(--ink); }
+    .audit p { margin: 0; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.65; }
+    .audit p + p { margin-top: 14px; color: #63582d; }
+    .stamp { display: inline-block; margin-top: 20px; border: 1px solid var(--red-dark); color: var(--red-dark); padding: 6px 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .08em; transform: rotate(-3deg); }
+
+    .reset {
+      border: 0;
+      background: none;
+      padding: 0;
+      color: var(--muted);
+      font: 11px 'DM Mono', monospace;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+    .reset:hover { color: var(--ink); }
+
+    @keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 50% { transform: scale(1.04); } }
+    .fresh { animation: pulse .35s ease; }
+
+    @media (max-width: 780px) {
+      .shell { width: min(100% - 28px, 620px); padding-top: 18px; }
+      header { padding-bottom: 16px; }
+      main { padding-top: 42px; }
+      .game-grid { grid-template-columns: 1fr; margin-top: 42px; }
+      .result { grid-template-columns: 1fr; gap: 20px; }
+      .side-column { grid-template-columns: 1fr 1fr; }
+      .audit { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 500px) {
+      h1 { font-size: clamp(3.4rem, 17vw, 5rem); }
+      .choice { min-height: 142px; padding: 12px; }
+      .choice-icon { font-size: 43px; }
+      .side-column { grid-template-columns: 1fr; }
+      .audit { grid-column: auto; }
+      .case-file { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="brand-mark">RPS</span><span>Unfair Advantage Lab</span></div>
+      <div class="case-file">CASE 008 / HONESTY PENDING</div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">Field test / hand-eye coordination</p>
+        <h1>Pick your<br>poison.</h1>
+        <p class="intro-copy">A rigorously fair game of rock, paper, scissors. Probably. Make a selection and the system will provide a totally defensible explanation.</p>
+      </section>
+
+      <div class="game-grid">
+        <section class="arena" aria-labelledby="choice-heading">
+          <p class="section-label" id="choice-heading">01 / Submit your move</p>
+          <div class="choice-row">
+            <button class="choice" data-choice="rock" type="button">
+              <span class="choice-icon" aria-hidden="true">◆</span>
+              <span class="choice-name">Rock</span>
+            </button>
+            <button class="choice" data-choice="paper" type="button">
+              <span class="choice-icon" aria-hidden="true">▧</span>
+              <span class="choice-name">Paper</span>
+            </button>
+            <button class="choice" data-choice="scissors" type="button">
+              <span class="choice-icon" aria-hidden="true">✂</span>
+              <span class="choice-name">Scissors</span>
+            </button>
+          </div>
+
+          <div class="result" id="result" aria-live="polite">
+            <div class="matchup" aria-label="Current matchup">
+              <div class="token" id="user-token">?</div>
+              <span class="versus">VS</span>
+              <div class="token ai" id="ai-token">?</div>
+            </div>
+            <div>
+              <p class="result-kicker" id="result-kicker">Awaiting evidence</p>
+              <h2 class="result-title" id="result-title">The lab is watching.</h2>
+              <p class="result-copy" id="result-copy">Choose a move to begin the highly regulated experiment.</p>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel" aria-labelledby="score-heading">
+            <div class="score-header">
+              <p class="section-label" id="score-heading">02 / Scoreboard</p>
+              <span class="live"><span class="status-dot"></span>Live</span>
+            </div>
+            <div class="score">
+              <div class="score-block">
+                <div class="score-number" id="user-score">0</div>
+                <div class="score-label">You</div>
+              </div>
+              <div class="score-divider"></div>
+              <div class="score-block">
+                <div class="score-number" id="ai-score">0</div>
+                <div class="score-label">AI</div>
+              </div>
+            </div>
+            <p class="suspicion" id="suspicion"><strong>Suspicion index:</strong> collecting initial evidence.</p>
+            <button class="reset" id="reset" type="button">Reset the evidence</button>
+          </section>
+
+          <section class="panel audit">
+            <p class="section-label">03 / AI reasoning</p>
+            <p id="audit-quote">“The AI has not made a move yet, which is statistically fascinating.”</p>
+            <p>Note: mercy is occasionally granted for calibration purposes. Please do not call it a pattern.</p>
+            <span class="stamp">PEER REVIEWED*</span>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const beats = { rock: 'paper', paper: 'scissors', scissors: 'rock' };
+    const losesTo = { rock: 'scissors', paper: 'rock', scissors: 'paper' };
+    const icons = { rock: '◆', paper: '▧', scissors: '✂' };
+    const fallbackExplanations = [
+      'The shape of your choice created a statistically dominant breeze.',
+      'I ran the numbers. They said “be unreasonable.”',
+      'Your move had a tiny hesitation in it. I exploited the vibes.',
+      'According to the ancient rules of office supplies, this was necessary.',
+      'I consulted the council. The council was extremely confident.'
+    ];
+    const names = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
+
+    let userWins = 0;
+    let aiWins = 0;
+    let rounds = 0;
+    const recentReasons = [];
+
+    const choiceButtons = document.querySelectorAll('.choice');
+    const userToken = document.querySelector('#user-token');
+    const aiToken = document.querySelector('#ai-token');
+    const result = document.querySelector('#result');
+    const resultKicker = document.querySelector('#result-kicker');
+    const resultTitle = document.querySelector('#result-title');
+    const resultCopy = document.querySelector('#result-copy');
+    const auditQuote = document.querySelector('#audit-quote');
+    const userScore = document.querySelector('#user-score');
+    const aiScore = document.querySelector('#ai-score');
+    const suspicion = document.querySelector('#suspicion');
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    async function getReason(userChoice, aiChoice, userWon) {
+      const outcome = userWon ? 'the user unexpectedly wins' : 'the AI wins as planned';
+      try {
+        const response = await fetch('/api/reason', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userChoice: names[userChoice],
+            aiChoice: names[aiChoice],
+            outcome,
+            recentReasons
+          })
+        });
+        if (!response.ok) throw new Error('Reasoning API unavailable');
+        const data = await response.json();
+        if (!data.reason) throw new Error('Reasoning API returned no reason');
+        return data.reason;
+      } catch (error) {
+        return randomItem(fallbackExplanations);
+      }
+    }
+
+    async function play(userChoice) {
+      rounds += 1;
+      choiceButtons.forEach(button => button.classList.toggle('selected', button.dataset.choice === userChoice));
+
+      // The mercy branch is intentionally rare; otherwise the AI chooses the counter after seeing the move.
+      const userGetsLucky = Math.random() < 0.125;
+      const aiChoice = userGetsLucky ? losesTo[userChoice] : beats[userChoice];
+      const userWon = userGetsLucky;
+
+      if (userWon) userWins += 1;
+      else aiWins += 1;
+
+      userToken.textContent = icons[userChoice];
+      aiToken.textContent = icons[aiChoice];
+      result.classList.remove('fresh');
+      void result.offsetWidth;
+      result.classList.add('fresh');
+
+      if (userWon) {
+        resultKicker.textContent = 'Unexpected outcome';
+        resultTitle.textContent = 'You won. Suspicious.';
+      } else {
+        resultKicker.textContent = 'Official result / AI wins';
+        resultTitle.textContent = 'That was inevitable.';
+      }
+
+      resultCopy.textContent = 'Consulting the impartial reasoning engine...';
+      auditQuote.textContent = '“Generating a defensible explanation...”';
+      const explanation = await getReason(userChoice, aiChoice, userWon);
+      resultCopy.textContent = explanation;
+      auditQuote.textContent = `“${explanation}”`;
+      recentReasons.unshift(explanation);
+      recentReasons.splice(3);
+
+      userScore.textContent = userWins;
+      aiScore.textContent = aiWins;
+      const rate = Math.round((aiWins / rounds) * 100);
+      suspicion.innerHTML = `<strong>Suspicion index:</strong> ${rate}% AI success. Statistically impossible, but okay.`;
+    }
+
+    choiceButtons.forEach(button => button.addEventListener('click', () => play(button.dataset.choice)));
+
+    document.querySelector('#reset').addEventListener('click', () => {
+      userWins = 0;
+      aiWins = 0;
+      rounds = 0;
+      choiceButtons.forEach(button => button.classList.remove('selected'));
+      userToken.textContent = '?';
+      aiToken.textContent = '?';
+      resultKicker.textContent = 'Awaiting evidence';
+      resultTitle.textContent = 'The lab is watching.';
+      resultCopy.textContent = 'Choose a move to begin the highly regulated experiment.';
+      auditQuote.textContent = '“The AI has not made a move yet, which is statistically fascinating.”';
+      userScore.textContent = '0';
+      aiScore.textContent = '0';
+      suspicion.innerHTML = '<strong>Suspicion index:</strong> collecting initial evidence.';
+    });
+  </script>
+</body>
+</html>
