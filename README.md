@@ -3,12 +3,11 @@
 # Unfair Advantage Lab: Rock Paper Scissors
 
 ## Basic Details
-### Team Name: [Add team name]
+### Team Name: E-Go
 
 ### Team Members
-- Team Lead: [Add name] - [Add college]
-- Member 2: [Optional]
-- Member 3: [Optional]
+- Team Lead: Unnikrishnan M - [Add college]
+- Member 2: Faseena Sherin C - [Add college]
 
 ### Project Description
 An intentionally rigged Rock Paper Scissors game where the AI watches the player's move and chooses the counter that beats it. It then invents a confident, ridiculous explanation for why the win was completely logical.
@@ -87,9 +86,8 @@ flowchart LR
 - Local demo URL: `http://localhost:3000`
 
 ## Team Contributions
-- [Add name]: Game concept, cheating logic, scoreboard, and interface.
-- [Add name]: Gemini integration and local fallback reasoning engine.
-- [Add name]: Testing, documentation, and demo media.
+- Unnikrishnan M: Game concept, cheating logic, scoreboard, and interface.
+- Faseena Sherin C: Gemini integration, local fallback reasoning engine, testing, and documentation.
 
 ---
 Made with ❤️ at TinkerHub Useless Projects
