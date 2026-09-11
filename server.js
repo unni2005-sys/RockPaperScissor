@@ -65,8 +65,6 @@ function generateLocalReason({ userChoice, aiChoice, outcome = '', recentReasons
 }
 
 async function generateReason({ userChoice, aiChoice, outcome, recentReasons = [] }) {
-  if (!process.env.OPENAI_API_KEY) return generateLocalReason({ userChoice, aiChoice, recentReasons });
-
   const recent = recentReasons.length
     ? `Avoid repeating these recent lines: ${recentReasons.join(' | ')}`
     : 'There are no previous lines to avoid.';
@@ -79,6 +77,25 @@ async function generateReason({ userChoice, aiChoice, outcome, recentReasons = [
     'Do not start with a label such as “Reason:” and do not use quotation marks.',
     recent
   ].join('\n');
+
+  if (process.env.GEMINI_API_KEY) {
+    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 1.15, maxOutputTokens: 60 }
+      })
+    });
+    if (!apiResponse.ok) throw new Error(`Gemini request failed: ${apiResponse.status}`);
+    const data = await apiResponse.json();
+    const reason = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (!reason) throw new Error('Gemini returned an empty reason');
+    return reason.replace(/^reason:\s*/i, '').replace(/^['“”"]|['“”"]$/g, '');
+  }
+
+  if (!process.env.OPENAI_API_KEY) return generateLocalReason({ userChoice, aiChoice, outcome, recentReasons });
 
   const apiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -151,7 +168,7 @@ server.on('error', error => {
 
 server.listen(port, () => {
   console.log(`RPS Unfair Advantage running at http://localhost:${port}`);
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn('OPENAI_API_KEY is not configured; using fallback reasoning.');
+  if (!process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
+    console.warn('No AI API key is configured; using local reasoning.');
   }
 });
