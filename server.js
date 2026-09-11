@@ -72,7 +72,7 @@ async function generateReason({ userChoice, aiChoice, outcome, recentReasons = [
   const prompt = [
     'Write one funny fake logical justification for a rigged rock-paper-scissors AI.',
     `The human played ${userChoice}; the AI played ${aiChoice}; ${outcome}.`,
-    'Make it one sentence, 14 to 26 words, specific to this matchup, confidently absurd, and medium-length.',
+    'Return exactly one complete sentence of 14 to 26 words, specific to this matchup, confidently absurd, and medium-length.',
     'Do not mention prompts, language models, policies, randomness, or that you are generating text.',
     'Do not start with a label such as “Reason:” and do not use quotation marks.',
     recent
@@ -85,7 +85,11 @@ async function generateReason({ userChoice, aiChoice, outcome, recentReasons = [
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 1.15, maxOutputTokens: 200 }
+        generationConfig: {
+          temperature: 1.15,
+          maxOutputTokens: 200,
+          thinkingConfig: { thinkingLevel: 'MINIMAL' }
+        }
       })
     });
     if (!apiResponse.ok) throw new Error(`Gemini request failed: ${apiResponse.status}`);
