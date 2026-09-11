@@ -6,8 +6,8 @@
 ### Team Name: E-Go
 
 ### Team Members
-- Team Lead: Unnikrishnan M - [Add college]
-- Member 2: Faseena Sherin C - [Add college]
+- Team Lead: Unnikrishnan M - ASIET
+- Member 2: Faseena Sherin C - ASIET
 
 ### Project Description
 An intentionally rigged Rock Paper Scissors game where the AI watches the player's move and chooses the counter that beats it. It then invents a confident, ridiculous explanation for why the win was completely logical.
