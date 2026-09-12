@@ -93,7 +93,7 @@ flowchart LR
 
 ### Project Demo
 #### Video
-[Add demo video link here]
+[Watch the screen recording](screenshots/Recording.mp4)
 
 *The demo should show a normal AI win, a generated explanation, the scoreboard update, and the occasional mercy win.*
 
