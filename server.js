@@ -37,7 +37,10 @@ const localUserWinTemplates = [
 ];
 
 function sendJson(response, status, payload) {
-  response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  response.writeHead(status, {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json; charset=utf-8'
+  });
   response.end(JSON.stringify(payload));
 }
 
@@ -150,6 +153,15 @@ function serveIndex(response) {
 }
 
 const server = http.createServer((request, response) => {
+  if (request.method === 'OPTIONS') {
+    response.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    });
+    response.end();
+    return;
+  }
   if (request.method === 'POST' && request.url === '/api/reason') {
     handleReason(request, response);
     return;

@@ -47,6 +47,22 @@ PORT=3000
 
 The `.env` file is ignored by Git and must never be committed.
 
+### Deployment
+
+GitHub Pages hosts the game interface, but it cannot run the Node.js API server. To enable Gemini reasoning online:
+
+1. Create a free Render web service from this repository using the included `render.yaml`.
+2. Add `GEMINI_API_KEY` in the Render service environment variables.
+3. Copy the deployed Render URL and set this line near the top of the game script in `index.html`:
+
+```js
+window.REASONING_API_URL = 'https://your-render-service.onrender.com/api/reason';
+```
+
+4. Commit and push `index.html` again. GitHub Pages will then call the Render API, while the key remains on the server.
+
+Without a deployed API URL, the GitHub Pages version still works using its local fallback reasoning.
+
 ### Project Documentation
 For Software:
 

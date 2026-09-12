@@ -375,6 +375,7 @@
       'I consulted the council. The council was extremely confident.'
     ];
     const names = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
+    const reasoningApiUrl = window.REASONING_API_URL || '/api/reason';
 
     let userWins = 0;
     let aiWins = 0;
@@ -400,7 +401,7 @@
     async function getReason(userChoice, aiChoice, userWon) {
       const outcome = userWon ? 'the user unexpectedly wins' : 'the AI wins as planned';
       try {
-        const response = await fetch('/api/reason', {
+        const response = await fetch(reasoningApiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
